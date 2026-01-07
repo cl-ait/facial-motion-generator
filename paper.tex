@@ -1,0 +1,356 @@
+%#!platex
+\documentclass[
+  platex, dvipdfmx,
+]{nlp2026}
+%english option
+%\documentclass[platex, dvipdfmx, english]{nlp2026}
+%#!uplatex
+%\documentclass[uplatex,dvipdfmx]{nlp2026}
+%#!lualatex
+%\documentclass[lualatex]{nlp2026}
+
+\usepackage{graphicx,xcolor}     
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\hypersetup{
+	colorlinks=true,
+    citecolor=blue,
+    linkcolor=blue,
+    urlcolor=blue,
+	pdfborder={0 0 0},
+}
+
+% (u)pLaTeX 用
+\usepackage[T1]{fontenc}    % モダンなフォントエンコーディング
+\usepackage{jlreq-deluxe}   % 多書体化（otf パッケージは使用しない）
+\usepackage{pxrubrica}      % ルビ
+\usepackage[verb]{bxghost}
+
+%% option 不要な場合はコメントアウト
+\usepackage{bxjalipsum}       % ダミーテキスト
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true, 
+    citecolor=blue, 
+    linkcolor=blue,
+    urlcolor=blue,
+	pdfborder={0 0 0},
+}
+\usepackage[verb]{bxghost}    % \verb 前後に適切な和欧文間スペース
+
+\usepackage{siunitx}
+\sisetup{detect-all}
+\sisetup{per-mode = symbol}
+\sisetup{range-phrase = {～}}
+\DeclareSIUnit{\MAC}{MACs}
+\DeclareSIUnit{\frame}{frame}
+\DeclareSIUnit{\param}{params}
+
+% 参考文献のフォントサイズを指定
+%\renewcommand{\bibfont}{\normalsize} % 標準サイズ
+%\renewcommand{\bibfont}{\footnotesize} % より小さく
+
+% \emph をゴシックかつ太字に（比較的新しい LaTeX が必要）
+\DeclareEmphSequence{\gtfamily\sffamily\bfseries}
+
+
+\newcommand{\pkg}[1]{\textsf{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{3Dアバターに適用可能な\\音声駆動型リアルタイム表情生成システム}
+
+\author{%
+  市川淳貴${}^{1}$　徳久良子${}^{1}$ ${}^{2}$\\
+${}^{1}$愛知工業大学　${}^{2}$理化学研究所\\
+\texttt{k22010@aitech.ac.jp}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+近年，3Dアバターを介した対話が普及する一方，音声に同期した表情生成は遅延や実装依存が課題である．本研究では，音声のみから表情動作の制御値を逐次推定し，ローカルでリアルタイム動作する\textbf{Facial Motion Generator}を提案する．異なる音声特徴量と軽量なCross-Attentionモデルを用いた設計により，Audio2Face-3Dと比較して単一話者データでMAE（平均絶対誤差）を\num{0.147}→\num{0.111}に低減し，推論時間を\SI{0.62}{\milli\second\per\frame}へ高速化した．
+%概要は最後まで書き上げてから一番最後に書く．とりあえず分量を把握するために１０行分ぐらい取っておく．あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ
+\end{abstract}
+
+\section{はじめに}
+
+%近年,3Dアバターを使用した配信や対話エージェントが普及し,声だけでなく表情を含む自然なコミュニケーションが求められている.
+%%なんのための研究か主張する
+%近年,3Dアバター配信や対話エージェントなど,人と人,人とAIのコミュニケーションに置いてアバターを介した表現が広がっている.
+
+3Dアバターを用いた配信や大規模言語モデルに基づく対話エージェントの普及により，近年，人と人および人とAIが仮想的なキャラクターを通してコミュニケーションする機会が増えている．
+本研究で扱う3Dアバターとは，人の姿や顔を3次元CGで表現したキャラクターであり，画面上でユーザやエージェントの「見た目」として振る舞うものである．
+%
+%%表情がコミュニケーションする上で重要であることを書く
+% こうした場面では，発話内容だけでなく，うなずきや口の動き，表情といった非言語情報が対話の自然さや理解のしやすさに大きく関わるため，アバターに表情を付与する技術が重要となる．
+人と3Dアバターとのコミュニケーションでは，発話内容だけでなく，うなずきや口の動き，表情といった非言語情報が，対話の自然さや相手の理解のしやすさに大きく関わる~\cite{kruzic2020facial,aburumman2022nodding}.
+そのため，アバターに対して人らしい表情を付与する技術は，コミュニケーションの質を左右する重要な要素である．
+%
+%% Kondoらはカメラで人の全身をスキャンし3Dアバターを生成する手法を提案している
+%%アバターについて掘り下げる
+% 一方で,アバターの表情を適切に動かすには,口や眉などの動きを表す情報を逐次推定して与える必要がある.
+ここで，アバターの表情を適切に制御するためには，口の開閉や眉の上げ下げといった動きを数値として表した「表情動作の制御値」を，各時刻において逐次推定し，アバターに与える必要がある．
+しかし，これらの制御値を人手で入力することは現実的ではなく，音声などの入力から自動的に推定する仕組みが求められる．
+
+
+
+
+%% エヌビディアがaudio2face-3dで音声のみからアバターの表情制御値を出力していることにふれる.
+% エヌビディアはこの課題を解決するために音声から表情制御に用いる値を推定する手法を提案している.
+%% audio2face-3dの課題
+%% エヌビディアのアバターの表情制御値の生成はAPI経由のため遅延がある.
+%% エヌビディアのアバターの表情制御値の生成は一部オープンソースではない.
+% エヌビディアの手法は高品質である一方,表情制御に用いる値の生成はAPI経由のためリアルタイムな表情制御には向いていないといった点や,これらのシステムは一部がオープンソースではないためローカル環境での実装が出来ないといった点に課題が残っている.
+
+この課題に対して，例えばNVIDIAは，音声から表情制御に用いる値を推定してアバターを駆動する手法（Audio2Face）を提案しており，高品質な表情生成を実現している~\cite{nvidia_a2f_dataset_claire}．% Audio2Faceは・・・が特徴の・・・である．
+Audio2Faceは，入力音声から口元や眉などの動きを表す表情制御値を推定し，その時系列に基づいて3Dアバターの表情を自動的に同期させるシステムである．
+Audio2Faceを用いてアバターを構築する方法も考えられるが，Audio2Faceの一部はAPI経由で動作する構成であるため，通信に起因する遅延が生じる可能性がある．対話のように入力に即応した表情更新が求められる用途では，同期ずれが生じやすく，表情表現の自然さを損ねる恐れがある．
+また，システムがオープンではない実装に依存する場合，ローカル環境における再現性や改良，運用が困難といった課題も残る．
+
+そこで本研究では，音声入力のみから表情動作の制御値を軽量に推定し，ローカル環境でリアルタイムに動作する音声駆動型表情生成手法\textbf{Facial Motion Generator}を提案する．
+% Facial Motion Generator
+% Facial Motion Synthesis
+図~\ref{fig:architecture}に，\textbf{Facial Motion Generator}によって3Dアバターの表情を駆動した出力例を示す．図~\ref{fig:architecture}は，「master」と発音した場合の顔表情を時系列で表示している．
+
+本研究の貢献は以下の2点である
+\begin{itemize}
+    \item 軽量でリアルタイムに動作する音声駆動型の表情生成手法 \textbf{Facial Motion Generator}の提案
+    \item \textbf{Facial Motion Generator}の実装および学習済みのウエイトを含むソースコードの公開\footnote{ソースコードは右記から入手できる：hoge} % \footnote{GitHub: \url{（URL）} %GitHubのリンクはfootnoteの形式で載せる
+\end{itemize}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figure/image18.pdf}
+  \caption{提案手法の出力例}
+  \label{fig:architecture}
+\end{figure}
+
+
+\section{関連研究}
+本章では，音声入力のみから顔表情を生成する関連研究と，3Dアバターの表情を動かすために用いられる表情の表現手法について述べる．
+\paragraph{音声入力による顔表情生成}
+%音声入力のみの関連研究について書く
+%% 音声入力のみを用いた関連研究をいくつか紹介する．ベースラインシステムにしているA2Fは必ず書く．
+
+
+
+%% Audio2Face-3D がARKit BlendShape形式で出力すること
+%% Audio2Faceのオープンソース化
+
+% 音声入力のみから顔表情を生成する研究
+% (i) 顔メッシュの頂点変位系列を直接予測する手法
+% (ii) 表情の動き(モーション)を係数で制御する値を推定する手法
+音声入力のみを用いた顔表情生成は，発話音声から口元や顔表情の時間変化を推定し，3Dアバターの顔の動きを自動生成する技術である．
+既存研究としては，音声から顔メッシュの頂点変位系列を直接予測する
+FaceFormer~\cite{fan2022faceformer}，VOCA~\cite{cudeiro2019voca}
+，音声から表情動作の制御値を生成するAudio2Face-3D~\cite{nvidia_a2f3d_overview,aburumman2022nodding}
+%Generation of Conversational Motions from Speech for CG AvatarCommunication and Analysis of Their Uniqueness
+などの手法が提案されている．
+
+
+
+
+% NVIDIA Audio2Face
+% NVIDIA Audio2Face-3Dは，音声を入力として表情アニメーションを生成する手法であり，表情の動きを制御する値を出力可能
+% 本研究では，Audio2Faceをベースラインとして比較評価を行う．
+
+NVIDIAのAudio2Face-3Dは音声から顔表情アニメーションを生成し，後述するBlendShapeという形式の表情動作の制御値を出力可能である．
+またNVIDIAは，学習フレームワークの例示用データとして，音声ファイルとそれに対応する表情係数や形状データ等を含むサンプルデータセット（Audio2Face-3D-Dataset-v1.0.0-claire）を公開している ．
+本研究では，Audio2Face-3Dをベースラインとして比較評価を行い，学習にはNVIDIAが公開しているデータセットを使用する\footnote{学習に利用したデータセットは右記からダウンロードできる：\url{https://huggingface.co/datasets/nvidia/Audio2Face-3D-Dataset-v1.0.0-claire}}．
+
+\paragraph{表情の表現手法と標準的な形式}
+%comment% 記述モデルってタイトルが違うかもなので適切に修正してください
+% 顔表情の表現と制御形式
+% 表情制御値の表現と標準形式
+% アバター表情を動かすための表現
+
+%%BlendShapeとかNLPの人は知らないからちゃんと書く
+
+% BlendShapeは3Dアバターの表情を制御，表現するパラメータの一種
+% 3Dアバターの表情を制御，表現するパラメータはBlendShapeの他にもいくつか種類がある．
+% (i) 顔メッシュや頂点座標を使った制御
+% (ii) あらかじめ用意した複数の表情形状を使った制御（BlendShape）
+% (iii) ボーン（関節）の回転や平行移動を使った制御
+% BlendShapeは，表情を係数ベクトルとして扱えるため学習モデルの出力にしやすく，ツールやゲームエンジンなどでも多数の採用例がある．
+
+% 本研究ではAppleのARKit BlendShapeを採用．
+% ARKit BlendShapeは，顔トラッキング結果を多数のBlendShape係数として提供し，各係数は0（中立）から1（最大）で表情の強さを表す
+% 近年の音声駆動システムでもARKit BlendShape形式を出力インタフェースとして採用する例がある
+
+% 本研究では，既存アバターへの適用容易性とベースラインとの互換性の観点から，BlendShape係数（例：ARKit BlendShape）を表情制御値として扱い，音声からその時系列を推定する．
+
+3Dアバターの顔表情は時間ごとに更新される制御パラメータの系列として与えられる．
+そのような表情表現の代表的な制御手法には，
+(i) 顔メッシュの頂点座標を直接変位させる方法~\cite{fan2022faceformer,pinskiy2010sliding}，
+(ii) あらかじめ用意した複数の表情の動きを係数で制御する方法~\cite{joshi2003learning,lewis2014_blendshape_star}，
+(iii) ボーン（関節）の回転や平行移動で顔部位を制御する方法~\cite{kavan2014skinning,blender_bones_intro}がある．
+このうち(ii)ではBlendShapeと呼ばれる係数を出力する手法が一般的である．
+BlendShape~\cite{apple_arkit_techtalk}は表情の動きを\num{52}個の要素に分解して表現する方法であり，各係数は口元や眉などの動きの大きさに対応し，中立状態を基準に0から1の範囲で表情の動きの大きさを表す．
+表情の動きを係数値として扱えるため学習モデルの出力として扱いやすく，ツール %blender
+やゲームエンジン % unreal
+とも接続可能な設計となっている．
+本研究では，既存アバターへの適用容易性とベースライン手法との互換性の観点から，BlendShapeの係数列を表情制御値として用い，音声から各時刻におけるBlendShapeの値を推定する．
+
+
+% A2Fの学習データセットについて
+
+\section{提案手法}
+
+%comment% わかりやすい図を書いて，それを引用しつつ説明する
+%\subsection アーキテクチャ
+図~\ref{fig:overview}に提案手法\textbf{Facial Motion Generator}の構成を示す．
+Facial Motion Generatorは音声入力のみを入力とし，3Dアバターの表情を駆動するための表情動作の制御値（\num{52}次元）をリアルタイムに推定する．
+提案手法は\textbf{Audio Encoder}と\textbf{表情生成モデル}から構成され，入力音声から抽出した音声特徴量（Log-MelおよびeGeMAPS）を用いて表情全体の動きを逐次出力する．
+出力された\num{52}次元の制御値を3Dアバターに適用することで，発話音声に合った表情をリアルタイムに生成する．
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figure/image14.pdf}
+\caption{提案手法の推論時アーキテクチャ}
+\label{fig:overview}
+\end{figure}
+
+% 図の左側 Audio Encoder の説明．
+% 図には Audio Encoder 部分に参照可能な記号や番号をふる
+\paragraph{Audio Encoder}
+図~\ref{fig:overview}(1)に示すように， Audio Encoderは音声から表情推定に有用な特徴量を抽出する．
+% Audio Encoderが出力する音声特徴量から表情制御値であるBlendShape係数（52次元）を時刻$t$ごとに逐次推定する．
+本研究では音のスペクトル情報を表すLog-Mel特徴量と，
+話し方の特徴である声の高さや強さ等を表すeGeMAPS特徴量を併用し，
+発音に由来する口形と抑揚に由来する表情変化の両方を扱う．
+
+またリアルタイム性を確保するために音声特徴量は固定の窓長と固定のフレーム数に制限することで,ストリーミング入力に対して一定でかつ少ない計算量で逐次推定を行う.
+具体的にはLog-Mel特徴量は窓長$25ms$，シフト 10 msで推論実行タイミングに対して最も近い$7$フレームを出力とし，eGeMAPS特徴量は窓長 5 s，シフト 300 msで推論実行タイミングに対して最も近い eGeMAPS ベクトルを選び，出力としている．
+
+
+% 図の右側生成モデルの説明 
+% 図を参照出来るように図を修正
+\paragraph{表情生成モデル}
+表情生成モデルは，図~\ref{fig:overview}(2)に示すように，音声特徴量を入力として表情動作の制御値であるBlendShape（\num{52}次元）を逐次推定する．
+%本研究では，\num{52}個のBlendShape要素をモデルが区別しやすくするために，各要素に対応した表情特徴量を用意する．
+本研究では，\num{52}個のBlendShapeの各要素に対応した表情特徴量を用意する．
+この表情特徴量は入力データから抽出する特徴ではなく，
+学習を通して自動的に調整されるパラメータである.
+%また，表情生成モデルに外から入力されている表情埋め込みは，52個の表情要素それぞれの役割をモデルが区別できるようにするためのBlendShape係数の内部表現である．
+推論時は表情特徴量を手がかりとして，音声特徴量のどの部分に注目するべきかをCross-Attentionで選択し，得られた音声特徴量から各BlendShapeの値を推定する.
+この仕組みにより，音声特徴量の成分が口元，眉，目など，どの表情要素の動きに対応するかをモデルが学習する.
+%このモデルではAudio Encoderから出力される各特性量が，口元や眉などの，どの表情動作(BlendShape係数)に対応するかを学習する．
+
+
+
+%\subsection 学習データと学習方法
+
+\paragraph{学習・評価用データと教師係数列の生成}
+
+学習と評価には，NVIDIAが公開する \textit{Audio2Face-3D-Dataset-v1.0.0-claire} を用いる．
+本データセットは単一話者Claireの音声と，各時刻の3D顔形状からなる顔メッシュ列で構成される．
+一方で，BlendShape係数はデータセットに含まれない．
+そこで，本データセットに付属しているBlendShape基底ファイルを用いて，各フレームの顔メッシュ系列をBlendShape\num{52}次元空間へ変換し，
+30fpsにリサンプリングした係数列を教師データとして生成した．
+%この変換には，BlendShapeの線形結合でメッシュを近似し線形最小二乗法により係数を推定するBlendShapeソルバを用いた．% BlendShape solvs 
+最終的に約\num{30}分に相当する\num{41}クリップから成るデータセットを構成し，Train/Val/Test のデータをそれぞれ\(\num{32}/\num{2}/\num{7}\)クリップ用意した.
+
+以上により，提案モデルは音声からBlendShape係数（\num{52}次元）を推定し，3Dアバターを表情駆動するシステムを構成する．
+
+
+
+
+
+
+
+
+\section{実験}
+本章では提案手法が音声からBlendShape係数をどの程度正確に推定できたか，および，リアルタイム運用に十分な計算効率を持つかを評価する.
+\subsection{BlendShapeの精度}
+
+テストクリップ（7 クリップ）上での全BlendShape・全フレームの MSE/MAE を表~\ref{tab:overall} に示す．
+MSE（Mean Squared Error; 平均二乗誤差）は予測値と真値との差の二乗平均で誤差の大きさを表す指標であり，値が小さいほど誤差が少ないことを表す．
+また，MAE（Mean Absolute Error; 平均絶対誤差）は予測値と真値との差の絶対値を平均した指標で，MSE と比べて外れ値の影響を受けにくく，典型的な誤差量を表す．
+いずれの指標も値が小さいほど推定精度が高い．
+表~\ref{tab:overall}より，提案手法は A2F-3D と比較して MSE が\num{0.074}から \num{0.035}へ低下し（差\num{0.039}），MAE も\num{0.147}から\num{0.111}へ低下した（差\num{0.036}）．
+本テスト条件では，提案手法が係数レベルの平均誤差を低減する傾向が確認できた．
+
+%テストクリップ(7 クリップ）上での全BlendShape・全フレームの MSE/MAE を表~\ref{tab:overall} に示す．MSE（Mean Squared Error; 平均二乗誤差）は予測値と真値との差の二乗平均で誤差の大きさを表すもので，値が小さいほど誤差が少ないことを表す．また，MAE....続き書いてください・・・である．提案手法は A2F-3Dと比べて MSE で約 0.039，MAE で約 0.036 小さく，係数レベルの誤差において明確に優位である．
+
+\begin{table}[t]
+\centering
+\caption{Audio2Face-3D と提案手法の係数レベル性能比較（Claire test split）}
+\label{tab:overall}
+\begin{tabular}{lcc}
+\toprule
+モデル & MSE$\downarrow$ & MAE$\downarrow$ \\
+\midrule
+A2F-3D & 0.074 & 0.147 \\
+Facial Motion Generator  & 0.035 & 0.111 \\
+\bottomrule
+\end{tabular}
+\vspace{0.3em}
+\parbox{\linewidth}{\footnotesize
+A2F-3D: Audio2Face-3D．\\
+Facial Motion Generator: 提案手法．}
+\end{table}
+
+
+
+\subsection{モデル規模と推論効率}
+
+モデル規模と推論時間を表~\ref{tab:speed} に示す．A2F-3D は約\num{181}~Mパラメータ，\SI{2.84}{\giga\MAC} を要し，推論時間は約\SI{21.5}{\milli\second\per\frame}であった．これに対し，提案手法は約\num{0.72}~Mパラメータ，\SI{0.0151}{\giga\MAC}と\num{2}桁以上軽量であり，推論時間は約\SI{0.62}{\milli\second\per\frame}である．
+
+\begin{table}[t]
+\centering
+\caption{モデル規模と推論時間の比較（Claire test split）}
+\label{tab:speed}
+\resizebox{\linewidth}{!}{ %横がはみ出ていたので追記しました（徳久）
+\begin{tabular}{lccc}
+\toprule
+モデル & パラメータ数 & MACs & 時間 [ms/frame] \\
+\midrule
+A2F-3D & 181M & 2.84G & 21.5 \\
+Facial Motion Generator & 0.723M & 0.0151G & 0.62 \\
+\bottomrule
+\end{tabular}
+}
+\vspace{0.3em}
+\parbox{\linewidth}{\footnotesize
+A2F-3D: Audio2Face-3D．\\
+Facial Motion Generator: 提案手法．}
+\end{table}
+
+これらの結果から，提案手法は A2F-3D と同一の BlendShape 係数空間において係数誤差を削減しつつ，パラメータ数・計算量・推論時間のいずれにおいても約\num{2}桁の削減を達成していることが分かる．計算資源が限られた環境において多数のアバターを同時駆動するシステムや，エッジデバイスでのリアルタイム運用において，大きな利点が期待できる．
+
+\subsection{結果の考察}
+表~\ref{tab:overall}および表~\ref{tab:speed}の結果，提案手法は A2F-3Dより小さい MAE/MSE を示しつつ，パラメータ数・MACs・推論時間を\numrange{1}{2}桁削減できている．一方で，動画として視聴した際の自然さという観点では，
+発話に同期した顎開閉や口唇形状など口周りの係数は変動するものの，
+眉・頬・眼瞼といった顔の上半分の計数変動が小さく，結果として口元しか動かない単調な表情になりやすい傾向が観察された．
+このため，瞬きや視線の変化，頬・眉の微細な揺らぎなどの非言語的運動が十分でなく，表情全体の豊かさという点では Audio2Face-3D の方が優れて見える場面があった．
+
+%また，本研究で用いたデータセットは単一話者 Claire のみから構成されており，Audio2Face-3D においては学習済みデータに近い条件である可能性がある．したがって，本稿の結果は「Claire 話者における BlendShape 係数再現性と計算効率」の比較としては有効である一方，多話者・多ドメイン環境での一般化性能の検証は今後の課題である．
+
+
+
+\section{まとめと今後の課題}
+
+本稿では，音声のみを入力として\num{52}次元のBlendShape 係数をリアルタイムに推定する軽量 Cross-Attention モデルを提案した．短期 Log-Mel と長期 eGeMAPS を統合し，BlendShape を Query とする構造により，口元の高速な動きと感情表情の緩やかな変化を単一ネットワークで扱えるようにした．
+
+Audio2Face-3D が学習に用いたデータの一部である Claire話者のデータセットから生成した BlendShape を用いて比較した結果，提案手法は約\num{0.7}~Mパラメータ・\SI{0.0151}{\giga\MAC} という軽量な構成で，Audio2Face-3D（\num{181}~M パラメータ・\SI{2.84}{\giga\MAC}と比べて係数 MAE/MSE が小さい値を示した．
+また,推論時間は\SI{0.62}{\milli\second\per\frame}（A2F-3D は\SI{21.5}{\milli\second\per\frame}）であり，測定環境（RTX 5070 Ti）において約\num{35}倍（\(\num{21.5}/\num{0.62}\approx\num{34.7}\)）の高速化を確認した．
+これにより，係数推定を多数同時に実行するようなリアルタイム運用において，計算資源の観点から有効であることが示された．
+
+%一方で，評価が単一話者データに限られていることや，動画としての主観的な自然さを直接測る評価がないことは，本研究の制約であり，多話者・多ドメイン条件での一般化性能は今後の検証が必要である．
+一方で，本研究には以下の制約がある．
+第一に，評価が単一話者に限られており，多話者・多ドメイン条件への一般化性能は未検証である．
+第二に，動画としての知覚品質を直接測る主観評価を実施していないため，係数誤差の差が知覚的な自然さの差に直結するかは確認できていない．
+第三に，実用上の最大の課題として，現状の提案手法は口周りの運動は生成できる一方で，眉・頬・眼瞼といった顔の上半分および非言語的運動の変化が乏しく，結果として口元しか動かない単調な表情になりやすい．
+以上の点は，今後のデータ拡張，評価設計，および上半顔運動の生成強化により改善する必要がある．
+%音声のみからこれらの運動を一意に決めることは本質的に難しく，対話の間や情動状態，発話内容に依存する成分が大きいことが一因と考えられる．
+
+
+今後は，多話者・多言語・多様な話し方を含むデータセットへの拡張に加え，話者や発話スタイルを条件とした表情生成手法の検討に取り組む．さらに，音声認識・言語理解・応答生成を担う対話システムや大規模言語モデルとの統合を進める．また，生成された表情に対する主観評価実験を実施し，提案手法がエージェント対話に与える影響を検証する．これらを通じて，発話内容と同期した表情制御を実現し，音声のみでも自然な対話体験を提供可能なマルチモーダル対話エージェントの基盤技術としての有効性を明らかにしたい．
+
+% 参考文献
+\bibliographystyle{junsrt}
+\bibliography{j_yourrefs}
+
+
+\end{document}

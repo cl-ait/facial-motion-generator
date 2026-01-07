@@ -1,0 +1,112 @@
+{
+  "affine": {
+    "jawOpen": {
+      "scale": 5.389339923858643,
+      "bias": -0.1844799965620041
+    },
+    "eyeSquintLeft": {
+      "scale": 0.7517709732055664,
+      "bias": 0.0009668658603914082
+    },
+    "eyeSquintRight": {
+      "scale": 1.519445538520813,
+      "bias": -0.0076120165176689625
+    },
+    "mouthUpperUpLeft": {
+      "scale": 0.30750173330307007,
+      "bias": 0.007146067917346954
+    },
+    "mouthUpperUpRight": {
+      "scale": 0.2562500536441803,
+      "bias": 0.016886023804545403
+    },
+    "mouthShrugUpper": {
+      "scale": 1.0,
+      "bias": 0.0
+    },
+    "mouthShrugLower": {
+      "scale": 1.0,
+      "bias": 0.0
+    },
+    "browOuterUpLeft": {
+      "scale": 0.6836056113243103,
+      "bias": 0.005676416680216789
+    },
+    "browOuterUpRight": {
+      "scale": 1.5982059240341187,
+      "bias": -0.009564102627336979
+    },
+    "mouthLowerDownLeft": {
+      "scale": 0.7657809853553772,
+      "bias": 0.0053856526501476765
+    },
+    "mouthLowerDownRight": {
+      "scale": 0.8707660436630249,
+      "bias": 0.001582555822096765
+    },
+    "mouthStretchLeft": {
+      "scale": 1.2599749565124512,
+      "bias": -0.0028574003372341394
+    },
+    "mouthStretchRight": {
+      "scale": 0.5874610543251038,
+      "bias": 0.016294296830892563
+    },
+    "mouthRollUpper": {
+      "scale": 0.09425181895494461,
+      "bias": 0.008763195015490055
+    },
+    "mouthPressLeft": {
+      "scale": 1.0,
+      "bias": 0.0
+    },
+    "mouthPressRight": {
+      "scale": 1.0,
+      "bias": 0.0
+    },
+    "cheekSquintLeft": {
+      "scale": 0.5724245309829712,
+      "bias": -0.0057619488798081875
+    },
+    "cheekSquintRight": {
+      "scale": 0.6957233548164368,
+      "bias": -0.009332247078418732
+    },
+    "mouthPucker": {
+      "scale": 10.809929847717285,
+      "bias": -0.2222002148628235
+    },
+    "mouthFrownRight": {
+      "scale": 8.71450138092041,
+      "bias": -0.21700479090213776
+    },
+    "mouthFrownLeft": {
+      "scale": 7.422445774078369,
+      "bias": -0.2043265998363495
+    },
+    "jawLeft": {
+      "scale": 4.0945725440979,
+      "bias": -0.22962380945682526
+    },
+    "jawRight": {
+      "scale": 3.4647796154022217,
+      "bias": -0.24624702334403992
+    },
+    "mouthClose": {
+      "scale": 3.3402669429779053,
+      "bias": -0.7892476916313171
+    },
+    "mouthFunnel": {
+      "scale": 4.9140496253967285,
+      "bias": -0.2687391936779022
+    },
+    "mouthSmileLeft": {
+      "scale": 4.199213027954102,
+      "bias": -0.3871879577636719
+    },
+    "mouthSmileRight": {
+      "scale": 5.783353805541992,
+      "bias": -0.1891373097896576
+    }
+  }
+}

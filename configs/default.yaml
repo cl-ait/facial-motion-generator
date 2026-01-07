@@ -1,0 +1,83 @@
+# Facial Motion Generator Configuration
+
+# Data settings
+data:
+  root: "data"
+  cache_dir: "cache"
+  sample_rate: 16000
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+
+# Audio features
+audio:
+  # Log-mel settings
+  mel:
+    n_mels: 80
+    hop_length_ms: 10
+    win_length_ms: 25
+    center: false
+    context_frames: 7
+
+  # eGeMAPS settings
+  egemaps:
+    shift_ms: 300
+    frame_ms: 5000
+    n_features: 88
+
+# Model architecture
+model:
+  n_blendshapes: 52
+  embed_dim: 64
+  d_model: 256
+  n_heads: 8
+  mlp_hidden: 512
+  dropout: 0.1
+  use_smoothing: false
+  smoothing_window: 3
+
+# Training settings
+training:
+  batch_size: 32
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+  num_epochs: 100
+  warmup_epochs: 5
+  gradient_clip: 1.0
+
+  # Scheduler
+  scheduler:
+    type: "cosine"
+    min_lr: 0.00001
+
+  # Loss
+  loss:
+    type: "dynamic_range"
+    dynamic_range:
+      boundary_weight: 2.5
+      exponent: 2.0
+    weights:
+      blendshape: 1.0
+      smoothness: 0.1  # Optional smoothness penalty
+
+  # Checkpoint
+  checkpoint:
+    save_every: 1  # epochs
+    keep_last: 5
+    save_best: true
+    monitor: "val_loss"
+
+# Inference settings
+inference:
+  update_rate: 30  # Hz (matches dataset FPS)
+  calibration_path: "configs/calibration.json"
+  osc_port: 9000
+  osc_host: "127.0.0.1"
+  device: "cuda"
+
+# Logging
+logging:
+  level: "INFO"
+  tensorboard: true
+  wandb: false
+  log_every: 10  # iterations
