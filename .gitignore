@@ -6,6 +6,7 @@ docs/CLAUDE.md
 .claude/
 *.claude.md
 memo.md
+paper.tex
 
 # ===================
 # Python

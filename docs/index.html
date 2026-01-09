@@ -189,15 +189,11 @@
     }
 
     /* Architecture */
-    .architecture {
-      background: var(--section-bg);
-      padding: 20px;
-      border-radius: 8px;
-      font-family: monospace;
-      font-size: 0.9rem;
-      overflow-x: auto;
-      white-space: pre;
-      line-height: 1.5;
+    .architecture-img {
+      width: 100%;
+      max-width: 800px;
+      display: block;
+      margin: 0 auto;
     }
 
     /* BibTeX */
@@ -355,26 +351,7 @@
     <section class="alt">
       <div class="container">
         <h2>Architecture</h2>
-        <div class="architecture">音声入力 (16kHz, モノラル)
-    ↓
-┌─────────────────────────────────────┐
-│ Audio Encoder                        │
-│  ├── Log-mel特徴 (80dim × 7frames)  │
-│  └── eGeMAPS特徴 (88dim)            │
-└─────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────┐
-│ Cross-Attention                      │
-│  Query: 52個のBlendShape埋め込み     │
-│  Key/Value: 音響特徴                 │
-└─────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────┐
-│ BlendShape MLP                       │
-│  → 52次元出力 (ARKit互換)            │
-└─────────────────────────────────────┘
-    ↓
-OSC出力 (30Hz)</div>
+        <img src="static/images/architecture_image.svg" alt="Facial Motion Generator Architecture" class="architecture-img">
       </div>
     </section>
 
