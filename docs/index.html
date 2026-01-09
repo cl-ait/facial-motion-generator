@@ -325,26 +325,27 @@
       </div>
     </section>
 
-    <!-- Background -->
+    <!-- Demo -->
     <section>
       <div class="container">
-        <h2>背景と課題</h2>
-        <div class="abstract">
-          <p>
-            3Dアバターを用いた配信や対話エージェントの普及により、人と人（もしくは人とAI）が仮想的なキャラクターを通してコミュニケーションする機会が増えています。
-            こうした場面では、発話内容だけでなく、うなずきや口の動き、表情といった<strong>非言語情報</strong>が対話の自然さや理解のしやすさに大きく関わります。
-          </p>
-          <p style="margin-top: 15px;">
-            アバターの表情を適切に制御するためには、口の開閉や眉の上げ下げといった動きを数値として表した「表情動作の制御値」を各時刻において逐次推定する必要があります。
-            NVIDIAのAudio2Faceは高品質な表情生成を実現していますが、一部はAPI経由で動作するため通信に起因する遅延が生じる可能性があり、
-            またシステムがオープンではない実装に依存する場合、ローカル環境における再現や改良が困難という課題があります。
-          </p>
-        </div>
+        <h2>推論デモ</h2>
+        <img src="static/images/inference_image.svg" alt="Inference Demo with 3D Avatar" class="architecture-img">
+        <p style="text-align: center; margin-top: 15px; color: #6b7280; font-size: 0.9rem;">
+          リアルタイム推論による3Dアバターの表情駆動例（3Dアバター: <a href="https://github.com/mmdagent-ex/gene" target="_blank">Gene</a>）
+        </p>
+      </div>
+    </section>
+
+    <!-- Architecture -->
+    <section class="alt">
+      <div class="container">
+        <h2>システム構成</h2>
+        <img src="static/images/architecture_image.svg" alt="Facial Motion Generator Architecture" class="architecture-img">
       </div>
     </section>
 
     <!-- Method -->
-    <section class="alt">
+    <section>
       <div class="container">
         <h2>提案手法</h2>
         <div class="abstract">
@@ -359,6 +360,24 @@
             <strong>表情生成モデル：</strong>52個のBlendShape要素それぞれに対応した表情特徴量（学習可能なパラメータ）をQueryとし、
             Cross-Attentionにより音声特徴量のどの部分に注目すべきかを計算します。
             これにより、音声特徴量の成分が口元・眉・目などどの表情要素に対応するかをモデルが学習し、軽量かつ高速な推論を実現しています。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Background -->
+    <section class="alt">
+      <div class="container">
+        <h2>背景と課題</h2>
+        <div class="abstract">
+          <p>
+            3Dアバターを用いた配信や対話エージェントの普及により、人と人（もしくは人とAI）が仮想的なキャラクターを通してコミュニケーションする機会が増えています。
+            こうした場面では、発話内容だけでなく、うなずきや口の動き、表情といった<strong>非言語情報</strong>が対話の自然さや理解のしやすさに大きく関わります。
+          </p>
+          <p style="margin-top: 15px;">
+            アバターの表情を適切に制御するためには、口の開閉や眉の上げ下げといった動きを数値として表した「表情動作の制御値」を各時刻において逐次推定する必要があります。
+            NVIDIAのAudio2Faceは高品質な表情生成を実現していますが、一部はAPI経由で動作するため通信に起因する遅延が生じる可能性があり、
+            またシステムがオープンではない実装に依存する場合、ローカル環境における再現や改良が困難という課題があります。
           </p>
         </div>
       </div>
@@ -395,25 +414,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-    </section>
-
-    <!-- Architecture -->
-    <section class="alt">
-      <div class="container">
-        <h2>システム構成</h2>
-        <img src="static/images/architecture_image.svg" alt="Facial Motion Generator Architecture" class="architecture-img">
-      </div>
-    </section>
-
-    <!-- Demo -->
-    <section>
-      <div class="container">
-        <h2>推論デモ</h2>
-        <img src="static/images/inference_image.svg" alt="Inference Demo with 3D Avatar" class="architecture-img">
-        <p style="text-align: center; margin-top: 15px; color: #6b7280; font-size: 0.9rem;">
-          リアルタイム推論による3Dアバターの表情駆動例（3Dアバター: <a href="https://github.com/mmdagent-ex/gene" target="_blank">Gene</a>）
-        </p>
       </div>
     </section>
 
