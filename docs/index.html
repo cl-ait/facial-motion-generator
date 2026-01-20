@@ -209,6 +209,51 @@
       margin: 0 auto;
     }
 
+    /* Video Carousel */
+    .video-carousel {
+      position: relative;
+      max-width: 800px;
+      margin: 30px auto 0;
+    }
+
+    .video-carousel video {
+      width: 100%;
+      border-radius: 8px;
+      background: #000;
+    }
+
+    .carousel-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-top: 15px;
+    }
+
+    .carousel-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: white;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .carousel-btn:hover {
+      background: var(--section-bg);
+      border-color: var(--primary-color);
+    }
+
+    .carousel-indicator {
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
     /* BibTeX */
     .bibtex {
       background: var(--section-bg);
@@ -334,6 +379,18 @@
         <p style="text-align: center; margin-top: 15px; color: #6b7280; font-size: 0.9rem;">
           リアルタイム推論による3Dアバターの表情駆動例（3Dアバター: <a href="https://github.com/mmdagent-ex/gene" target="_blank">Gene</a>）
         </p>
+
+        <!-- Video Carousel -->
+        <div class="video-carousel">
+          <video id="demo-video" controls>
+            <source src="static/videos/english1.mp4" type="video/mp4">
+          </video>
+          <div class="carousel-controls">
+            <button class="carousel-btn" onclick="prevVideo()">&#8249;</button>
+            <span class="carousel-indicator"><span id="video-current">1</span> / <span id="video-total">8</span></span>
+            <button class="carousel-btn" onclick="nextVideo()">&#8250;</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -474,6 +531,35 @@
         btn.textContent = 'Copied!';
         setTimeout(() => btn.textContent = 'Copy', 2000);
       });
+    }
+
+    // Video Carousel
+    const videos = [
+      'static/videos/english1.mp4',
+      'static/videos/english2.mp4',
+      'static/videos/english3.mp4',
+      'static/videos/english4.mp4',
+      'static/videos/english6.mp4',
+      'static/videos/english7.mp4',
+      'static/videos/english8.mp4',
+      'static/videos/english9.mp4'
+    ];
+    let currentVideo = 0;
+
+    function updateVideo() {
+      const video = document.getElementById('demo-video');
+      video.src = videos[currentVideo];
+      document.getElementById('video-current').textContent = currentVideo + 1;
+    }
+
+    function nextVideo() {
+      currentVideo = (currentVideo + 1) % videos.length;
+      updateVideo();
+    }
+
+    function prevVideo() {
+      currentVideo = (currentVideo - 1 + videos.length) % videos.length;
+      updateVideo();
     }
   </script>
 
